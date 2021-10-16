@@ -30,3 +30,7 @@ body{
     width: 100px;
     background-color: rgba(120,120,120,0.5);
 }
+
+#welcome{
+    color: Orange;
+}
