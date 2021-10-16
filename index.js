@@ -77,6 +77,7 @@ async function createPokemon(identifier){
     const selectedPokemon = pokemonInfo(pokemonResponse);
     generatePokemon(selectedPokemon);
     addHoverListeners(selectedPokemon.front, selectedPokemon.back);
+    addTypesListeners(selectedPokemon);
 }
 function clearPrevPokemon(){
     const existingPokemons = document.querySelectorAll(".pokemon");
@@ -97,22 +98,79 @@ function addHoverListeners(frontImg, backImg){
     }
 }
 
+// Shows pokemon's back instead of front
 function showBack(event, backImg){
     const hoveredPokemonFront = event.target;
     hoveredPokemonFront.setAttribute("src", backImg);
 }
 
+// Shows a pokemon's front instead of back
 function showFront(event, frontImg){
     const revertPokemonBack = event.target;
     revertPokemonBack.setAttribute("src", frontImg);
 }
 
+// Adds click listener for each type of a pokemon
+function addTypesListeners(){
+    const typeList = document.querySelectorAll(".types");
+    for(let type of typeList){
+        type.addEventListener("click", searchType)
+    }
+}
+
+// Searches all pokemons by a type and displays them
+async function searchType(event){
+    const clickedType = event.target.innerText;
+    const typePokemons = await getTypePokemons(clickedType);
+    displayTypePokemons(typePokemons);
+}
+
+// Searches all pokemons by a type
+async function getTypePokemons(type){
+    const response = await axios.get(`${baseURL}type/${type}`).catch((error) => {
+        throw error
+    });
+    return response.data;
+}
+
+// Displays all matching type pokemons
+function displayTypePokemons(typePokemons){
+    clearPrevTypePokemons();
+    const typePokemonList = createTypePokemonList();
+
+    const pokemonList = typePokemons.pokemon;
+    for(let pokemon of pokemonList){
+        const typePokemon = document.createElement("li");
+        typePokemon.innerText = pokemon.pokemon.name;
+        typePokemonList.appendChild(typePokemon);
+    }
+}
+
+// Clears all previously displayed matching type pokemons
+function clearPrevTypePokemons(){
+    const typePokemons = document.querySelectorAll(".type_pokemons");
+    for(let pokemon of typePokemons){
+        pokemon.remove();
+    }
+}
+
+// Creates a list for all matching type pokemons 
+function createTypePokemonList(){
+    const pokemonDisplayList = document.createElement("ul");
+    pokemonDisplayList.classList.add("type_pokemons");
+    const selectedPokemon = document.querySelector("#selected_pokemon");
+    selectedPokemon.appendChild(pokemonDisplayList);
+    return pokemonDisplayList;
+}
+
+// Searches for a pokemon by its name or id
 function searchPokemon(){
     const inputValue = document.getElementById("pokemon_input").value;
     createPokemon(inputValue);
 }
 
-// createPokemon("pikachu");
+createPokemon("magnemite");
+
 const searchButton = document.querySelector("#search_pokemon");
 searchButton.addEventListener("click", searchPokemon);
 
