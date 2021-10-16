@@ -1,5 +1,5 @@
 const baseURL = "https://pokeapi.co/api/v2/";
-// identifier is name or id
+// Searches for a pokemon by its name or id
 async function getPokemon(identifier){
     if (typeof(identifier) === "string"){
         identifier = identifier.toLowerCase();
@@ -11,7 +11,7 @@ async function getPokemon(identifier){
     return response.data;
 }
 
-// returns a pokemon object with selected attributes
+// Returns a pokemon object with selected attributes
 function pokemonInfo(pokemon){
     const newPokemon = {
         name: pokemon.name,
@@ -24,7 +24,7 @@ function pokemonInfo(pokemon){
     return newPokemon;
 }
 
-// generates a new pokemon in DOM
+// Generates a new pokemon in DOM
 // pokemon = obj
 function generatePokemon(pokemon){
     const newPokemon = document.createElement("div");
@@ -38,7 +38,7 @@ function generatePokemon(pokemon){
     resultArea.appendChild(newPokemon);
 }
 
-// returns an element with the content
+// Returns an element with the value as content
 function checkAttribute(attribute, value){
     if(attribute === "front"){
         const newImg = document.createElement("img");
@@ -57,6 +57,7 @@ function checkAttribute(attribute, value){
     }
 }
 
+// Creates the types section
 // types is an object
 function createTypes(types){
     const typesList = document.createElement("div");
@@ -70,7 +71,7 @@ function createTypes(types){
     return typesList;
 }
 
-// identifier is name or id
+// Displays a new featured Pokemon.
 async function createPokemon(identifier){
     clearPrevPokemon();
     const pokemonResponse = await getPokemon(identifier);
@@ -79,6 +80,8 @@ async function createPokemon(identifier){
     addHoverListeners(selectedPokemon.front, selectedPokemon.back);
     addTypesListeners(selectedPokemon);
 }
+
+// Clears all previously displayed pokemons
 function clearPrevPokemon(){
     const existingPokemons = document.querySelectorAll(".pokemon");
     for(let pokemon of existingPokemons){
@@ -86,6 +89,7 @@ function clearPrevPokemon(){
     }
 }
 
+// Hovering mouse over a pokemon will display its back image, leaving will revert to front
 function addHoverListeners(frontImg, backImg){
     const pokemons = document.querySelectorAll(".pokemon_picture");
     for(let pokemon of pokemons){
@@ -98,13 +102,13 @@ function addHoverListeners(frontImg, backImg){
     }
 }
 
-// Shows pokemon's back instead of front
+// Shows the pokemon's back instead of front
 function showBack(event, backImg){
     const hoveredPokemonFront = event.target;
     hoveredPokemonFront.setAttribute("src", backImg);
 }
 
-// Shows a pokemon's front instead of back
+// Shows the pokemon's front instead of back
 function showFront(event, frontImg){
     const revertPokemonBack = event.target;
     revertPokemonBack.setAttribute("src", frontImg);
@@ -163,7 +167,7 @@ function createTypePokemonList(){
     return pokemonDisplayList;
 }
 
-// Searches for a pokemon by its name or id
+// Searches for a pokemon by its name or id with the text in the search bar
 function searchPokemon(){
     const inputValue = document.getElementById("pokemon_input").value;
     createPokemon(inputValue);
