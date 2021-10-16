@@ -54,10 +54,17 @@ function checkAttribute(attribute, value){
 
 // identifier is name or id
 async function createPokemon(identifier){
+    clearPrevPokemon();
     const pokemonResponse = await getPokemon(identifier);
     const selectedPokemon = pokemonInfo(pokemonResponse);
     generatePokemon(selectedPokemon);
     addHoverListeners(selectedPokemon.front, selectedPokemon.back);
+}
+function clearPrevPokemon(){
+    const existingPokemons = document.querySelectorAll(".pokemon");
+    for(let pokemon of existingPokemons){
+        pokemon.remove();
+    }
 }
 
 function addHoverListeners(frontImg, backImg){
@@ -82,4 +89,11 @@ function showFront(event, frontImg){
     revertPokemonBack.setAttribute("src", frontImg);
 }
 
-createPokemon("pikachu");
+function searchPokemon(){
+    const inputValue = document.getElementById("pokemon_input").value;
+    createPokemon(inputValue);
+}
+
+// createPokemon("pikachu");
+const searchButton = document.querySelector("#search_pokemon");
+searchButton.addEventListener("click", searchPokemon);
