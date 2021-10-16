@@ -17,9 +17,9 @@ function pokemonInfo(pokemon){
         name: pokemon.name,
         height: pokemon.height,
         weight: pokemon.weight,
+        types: pokemon.types,
         front: pokemon.sprites.front_default,
         back: pokemon.sprites.back_default,
-        types: pokemon.types
     }
     return newPokemon;
 }
@@ -122,7 +122,7 @@ function addTypesListeners(){
     }
 }
 
-// Searches all pokemons by a type and displays them
+// Searches all pokemons by the cilcked type, and displays them
 async function searchType(event){
     const clickedType = event.target.innerText;
     const typePokemons = await getTypePokemons(clickedType);
@@ -145,14 +145,16 @@ function displayTypePokemons(typePokemons){
     const pokemonList = typePokemons.pokemon;
     for(let pokemon of pokemonList){
         const typePokemon = document.createElement("li");
+        typePokemon.classList.add("type_pokemons");
         typePokemon.innerText = pokemon.pokemon.name;
         typePokemonList.appendChild(typePokemon);
     }
+    addClickToTypePokemons();
 }
 
 // Clears all previously displayed matching type pokemons
 function clearPrevTypePokemons(){
-    const typePokemons = document.querySelectorAll(".type_pokemons");
+    const typePokemons = document.querySelectorAll(".type_pokemons_list");
     for(let pokemon of typePokemons){
         pokemon.remove();
     }
@@ -161,7 +163,7 @@ function clearPrevTypePokemons(){
 // Creates a list for all matching type pokemons 
 function createTypePokemonList(){
     const pokemonDisplayList = document.createElement("ul");
-    pokemonDisplayList.classList.add("type_pokemons");
+    pokemonDisplayList.classList.add("type_pokemons_list");
     const selectedPokemon = document.querySelector("#selected_pokemon");
     selectedPokemon.appendChild(pokemonDisplayList);
     return pokemonDisplayList;
@@ -171,6 +173,33 @@ function createTypePokemonList(){
 function searchPokemon(){
     const inputValue = document.getElementById("pokemon_input").value;
     createPokemon(inputValue);
+}
+
+// Adds a listener to every matching type pokemon
+function addClickToTypePokemons(){
+    const typePokemons = document.querySelectorAll(".type_pokemons");
+    for(let pokemon of typePokemons){
+        pokemon.addEventListener("click", typePokemonClicked)
+    }
+}
+
+// Handles a click on a matching type pokemon
+async function typePokemonClicked(event){
+    const clickedPokemon = event.target;
+    await createPokemon(clickedPokemon.innerText);
+    generateTypeListAgain();
+}
+
+// Generates the type list again so it'll be after the featured pokemon
+function generateTypeListAgain(){
+    const typePokemonsList = document.querySelectorAll(".type_pokemons_list");
+    for(let list of typePokemonsList){
+        list.remove();
+    }
+    const selectedPokemon = document.querySelector("#selected_pokemon");
+    for(let list of typePokemonsList){
+        selectedPokemon.appendChild(list);
+    }
 }
 
 createPokemon("magnemite");
