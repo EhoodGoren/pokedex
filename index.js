@@ -18,7 +18,8 @@ function pokemonInfo(pokemon){
         height: pokemon.height,
         weight: pokemon.weight,
         front: pokemon.sprites.front_default,
-        back: pokemon.sprites.back_default
+        back: pokemon.sprites.back_default,
+        types: pokemon.types
     }
     return newPokemon;
 }
@@ -37,6 +38,7 @@ function generatePokemon(pokemon){
     resultArea.appendChild(newPokemon);
 }
 
+// returns an element with the content
 function checkAttribute(attribute, value){
     if(attribute === "front"){
         const newImg = document.createElement("img");
@@ -45,11 +47,27 @@ function checkAttribute(attribute, value){
         return newImg;
     }
     if(attribute === "back") return "dont_display";
+    if(attribute === "types"){
+        return createTypes(value);
+    }
     else{
         const textAttribtue = document.createElement("div");
         textAttribtue.innerText = `${attribute}: ${value}`;
         return textAttribtue;
     }
+}
+
+// types is an object
+function createTypes(types){
+    const typesList = document.createElement("div");
+    typesList.innerText = "Types: ";
+    for(let type of types){
+        const newType = document.createElement("div");
+        newType.innerText += `${type.type.name} `;
+        newType.classList.add("types");
+        typesList.appendChild(newType);
+    }
+    return typesList;
 }
 
 // identifier is name or id
@@ -97,3 +115,6 @@ function searchPokemon(){
 // createPokemon("pikachu");
 const searchButton = document.querySelector("#search_pokemon");
 searchButton.addEventListener("click", searchPokemon);
+
+// document.body.style.backgroundImage = "url('https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/2fb2821a-1406-4a1d-9b04-6668f278e944/d843okx-eb13e8e4-0fa4-4fa9-968a-e0f36ff168de.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzJmYjI4MjFhLTE0MDYtNGExZC05YjA0LTY2NjhmMjc4ZTk0NFwvZDg0M29reC1lYjEzZThlNC0wZmE0LTRmYTktOTY4YS1lMGYzNmZmMTY4ZGUucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.TIK_E5L8dTyBUk_dADA5WkLP8jSJMR7YGJG54KNAido')"
+// document.querySelector("#selected_pokemon").style.backgroundImage = "url('')"
