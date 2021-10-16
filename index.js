@@ -5,19 +5,17 @@ async function getPokemon(identifier){
         identifier = identifier.toLowerCase();
     }
     identifier = identifier.toLowerCase();
-    const response = await axios.get(`${baseURL}pokemon/${identifier}`).catch((error) => {
-        throw error
-    });
+    const response = await axios.get(`${baseURL}pokemon/${identifier}`);
     return response.data;
 }
 
 // Returns a pokemon object with selected attributes
 function pokemonInfo(pokemon){
     const newPokemon = {
-        name: pokemon.name,
-        height: pokemon.height,
-        weight: pokemon.weight,
-        types: pokemon.types,
+        Name: pokemon.name,
+        Height: pokemon.height,
+        Weight: pokemon.weight,
+        Types: pokemon.types,
         front: pokemon.sprites.front_default,
         back: pokemon.sprites.back_default,
     }
@@ -47,7 +45,7 @@ function checkAttribute(attribute, value){
         return newImg;
     }
     if(attribute === "back") return "dont_display";
-    if(attribute === "types"){
+    if(attribute === "Types"){
         return createTypes(value);
     }
     else{
@@ -74,7 +72,15 @@ function createTypes(types){
 // Displays a new featured Pokemon.
 async function createPokemon(identifier){
     clearPrevPokemon();
-    const pokemonResponse = await getPokemon(identifier);
+    clearPrevTypePokemons();
+    let error = false;
+    const pokemonResponse = await getPokemon(identifier).catch(() => {
+        error = true;
+    });
+    if(error){
+        pokemonNotFound();
+        return;
+    }
     const selectedPokemon = pokemonInfo(pokemonResponse);
     generatePokemon(selectedPokemon);
     addHoverListeners(selectedPokemon.front, selectedPokemon.back);
@@ -119,6 +125,12 @@ function addTypesListeners(){
     const typeList = document.querySelectorAll(".types");
     for(let type of typeList){
         type.addEventListener("click", searchType)
+        type.addEventListener("mouseover", () => {
+            type.classList.add("hovered");
+        });
+        type.addEventListener("mouseleave", () => {
+            type.classList.remove("hovered");
+        })
     }
 }
 
@@ -131,9 +143,7 @@ async function searchType(event){
 
 // Searches all pokemons by a type
 async function getTypePokemons(type){
-    const response = await axios.get(`${baseURL}type/${type}`).catch((error) => {
-        throw error
-    });
+    const response = await axios.get(`${baseURL}type/${type}`);
     return response.data;
 }
 
@@ -171,8 +181,9 @@ function createTypePokemonList(){
 
 // Searches for a pokemon by its name or id with the text in the search bar
 function searchPokemon(){
-    const inputValue = document.getElementById("pokemon_input").value;
-    createPokemon(inputValue);
+    let input = document.getElementById("pokemon_input");
+    createPokemon(input.value);
+    input.value = "";
 }
 
 // Adds a listener to every matching type pokemon
@@ -190,10 +201,16 @@ async function typePokemonClicked(event){
     clearPrevTypePokemons();
 }
 
-createPokemon("magnemite");
+function pokemonNotFound(){
+    const pokemon = document.querySelector("#selected_pokemon");
+    const error = document.createElement("div");
+    error.innerText = "Pokemon not found";
+    pokemon.appendChild(error);
+    setTimeout(() => pokemon.removeChild(error), 5000);
+}
 
 const searchButton = document.querySelector("#search_pokemon");
 searchButton.addEventListener("click", searchPokemon);
 
-// document.body.style.backgroundImage = "url('https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/2fb2821a-1406-4a1d-9b04-6668f278e944/d843okx-eb13e8e4-0fa4-4fa9-968a-e0f36ff168de.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzJmYjI4MjFhLTE0MDYtNGExZC05YjA0LTY2NjhmMjc4ZTk0NFwvZDg0M29reC1lYjEzZThlNC0wZmE0LTRmYTktOTY4YS1lMGYzNmZmMTY4ZGUucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.TIK_E5L8dTyBUk_dADA5WkLP8jSJMR7YGJG54KNAido')"
-// document.querySelector("#selected_pokemon").style.backgroundImage = "url('')"
+document.body.style.backgroundImage = "url('https://pbs.twimg.com/media/DVMT-6OXcAE2rZY.jpg')"
+// document.querySelector("#selected_pokemon").style.backgroundImage = "url('http://cdn.shopify.com/s/files/1/1756/9559/products/pokeball_coaster_photo_33c69500-8564-4842-a2a7-3803975a2d3b_1024x1024.jpg?v=1557064432')"
