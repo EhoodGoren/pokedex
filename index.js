@@ -187,19 +187,7 @@ function addClickToTypePokemons(){
 async function typePokemonClicked(event){
     const clickedPokemon = event.target;
     await createPokemon(clickedPokemon.innerText);
-    generateTypeListAgain();
-}
-
-// Generates the type list again so it'll be after the featured pokemon
-function generateTypeListAgain(){
-    const typePokemonsList = document.querySelectorAll(".type_pokemons_list");
-    for(let list of typePokemonsList){
-        list.remove();
-    }
-    const selectedPokemon = document.querySelector("#selected_pokemon");
-    for(let list of typePokemonsList){
-        selectedPokemon.appendChild(list);
-    }
+    clearPrevTypePokemons();
 }
 
 createPokemon("magnemite");
