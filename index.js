@@ -14,9 +14,10 @@ async function getPokemon(identifier){
 // returns a pokemon object with selected attributes
 function pokemonInfo(pokemon){
     const newPokemon = {
+        name: pokemon.name,
         height: pokemon.height,
         weight: pokemon.weight,
-        img: pokemon.sprites.front_default,
+        front: pokemon.sprites.front_default,
         back: pokemon.sprites.back_default
     }
     return newPokemon;
@@ -26,23 +27,27 @@ function pokemonInfo(pokemon){
 // pokemon = obj
 function generatePokemon(pokemon){
     const newPokemon = document.createElement("div");
+    newPokemon.classList.add("pokemon");
     for(let attribute in pokemon){
-        const newAttribute = checkAttribute(pokemon, attribute)
+        const newAttribute = checkAttribute(attribute, pokemon[attribute]);
+        if(newAttribute === "dont_display") continue;
         newPokemon.appendChild(newAttribute);
     }
     const resultArea = document.getElementById("selected_pokemon");
     resultArea.appendChild(newPokemon);
 }
 
-function checkAttribute(pokemon, attribute){
-    if(attribute === "img" || attribute === "back"){
+function checkAttribute(attribute, value){
+    if(attribute === "front"){
         const newImg = document.createElement("img");
-        newImg.setAttribute("src", pokemon[attribute]);
+        newImg.setAttribute("src", value);
+        newImg.classList.add("pokemon_picture");
         return newImg;
     }
+    if(attribute === "back") return "dont_display";
     else{
         const textAttribtue = document.createElement("div");
-        textAttribtue.innerText = `${attribute}: ${pokemon[attribute]}`;
+        textAttribtue.innerText = `${attribute}: ${value}`;
         return textAttribtue;
     }
 }
@@ -50,9 +55,31 @@ function checkAttribute(pokemon, attribute){
 // identifier is name or id
 async function createPokemon(identifier){
     const pokemonResponse = await getPokemon(identifier);
-    console.log(pokemonResponse)
     const selectedPokemon = pokemonInfo(pokemonResponse);
     generatePokemon(selectedPokemon);
+    addHoverListeners(selectedPokemon.front, selectedPokemon.back);
 }
 
-createPokemon("Pikachu");
+function addHoverListeners(frontImg, backImg){
+    const pokemons = document.querySelectorAll(".pokemon_picture");
+    for(let pokemon of pokemons){
+        pokemon.addEventListener("mouseover", (event) => {
+            showBack(event, backImg);
+        });
+        pokemon.addEventListener("mouseleave", (event) => {
+            showFront(event, frontImg);
+        });
+    }
+}
+
+function showBack(event, backImg){
+    const hoveredPokemonFront = event.target;
+    hoveredPokemonFront.setAttribute("src", backImg);
+}
+
+function showFront(event, frontImg){
+    const revertPokemonBack = event.target;
+    revertPokemonBack.setAttribute("src", frontImg);
+}
+
+createPokemon("pikachu");
