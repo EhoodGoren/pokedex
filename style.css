@@ -1,0 +1,36 @@
+#selected_pokemon {
+    border-style: solid;
+}
+
+body{
+    background-size: 100%;
+}
+
+#selected_pokemon {
+    margin-left: 5px;
+    width: 50vw;
+    font-size: 20px;
+    background-color: rgba(255,255,255,0.5);
+}
+
+#selected_pokemon * {
+    margin-left: 5px;
+}
+
+#pokemon_input {
+    margin-top: 5px;
+}
+
+.pokemon_picture {
+    height: 150px;
+    width: 150px;
+}
+
+.hovered {
+    width: 100px;
+    background-color: rgba(120,120,120,0.5);
+}
+
+#welcome{
+    color: Orange;
+}
