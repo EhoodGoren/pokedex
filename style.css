@@ -29,6 +29,12 @@ body{
     height: 40px;
 }
 
+#user_pokemons {
+    margin: 5px 0px 5px 5px;
+    border-style: solid;
+    width: 25vw;
+}
+
 .pokemon_picture {
     height: 150px;
     width: 150px;

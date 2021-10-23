@@ -3,19 +3,24 @@ const baseURL = "http://localhost:3000/";
 async function getPokemon(identifier){
     const username = document.querySelector('#username').value;
     let response;
-    if (typeof(identifier) === "string"){
-        identifier = identifier.toLowerCase();
-        response = await axios.get(`${baseURL}pokemon/query?query=${identifier}`, {
-            headers: {
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "*",
-                "Access-Control-Allow-Headers": "*",
-                "username": username,
-            }
-        });
+    try{
+        if (typeof(identifier) === "string"){
+            identifier = identifier.toLowerCase();
+            response = await axios.get(`${baseURL}pokemon/query?query=${identifier}`, {
+                headers: {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "*",
+                    "Access-Control-Allow-Headers": "*",
+                    "username": username,
+                }
+            });
+        }
+        else{
+            response = await axios.get(`${baseURL}pokemon/get/${identifier}`);
+        }
     }
-    else{
-        response = await axios.get(`${baseURL}pokemon/get/${identifier}`);
+    catch (error){
+        displayError("Can't find pokemon");
     }
     // identifier = identifier.toLowerCase();
     // const response = await axios.get(`${baseURL}pokemon/${identifier}`);
@@ -76,7 +81,6 @@ function checkAttribute(attribute, value){
 // Creates the types section
 // types is an object
 function createTypes(types){
-    console.log(types);
     const typesList = document.createElement("div");
     typesList.innerText = "Types: ";
     for(let type of types){
@@ -156,7 +160,7 @@ function showFront(event, frontImg){
 function addTypesListeners(){
     const typeList = document.querySelectorAll(".types");
     for(let type of typeList){
-        type.addEventListener("click", searchType)
+        // type.addEventListener("click", searchType)
         type.addEventListener("mouseover", () => {
             type.classList.add("hovered");
         });
@@ -240,7 +244,7 @@ function pokemonNotFound(){
     error.innerText = "Pokemon not found";
     // pokemon.appendChild(error);
     // setTimeout(() => pokemon.removeChild(error), 5000);
-    setTimeout(() => {error.value=""}, 5000);
+    setTimeout(() => {document.querySelector('#status').value=""}, 5000);
 }
 
 const searchButton = document.querySelector("#search_pokemon");
@@ -248,3 +252,71 @@ searchButton.addEventListener("click", searchPokemon);
 
 document.body.style.backgroundImage = "url('https://pbs.twimg.com/media/DVMT-6OXcAE2rZY.jpg')";
 
+
+document.querySelector('#capture').addEventListener('click', capturePokemon)
+
+async function capturePokemon(){
+    const username = document.querySelector('#username').value;
+    const id = document.querySelector('#pokemon_input').value;
+    if(!typeof(id) === 'number') return;
+    try{
+        await axios.put(`${baseURL}pokemon/catch/${id}`,{},{
+            headers: {
+                // "Access-Control-Allow-Origin": "*",
+                // "Access-Control-Allow-Methods": "*",
+                // "Access-Control-Allow-Headers": "*",
+                "username": username,
+            }
+        })
+        document.querySelector('#status').innerText = 'Captured!';
+        setTimeout(()=>document.querySelector('#status').innerText = '',5000);
+        await getUsersPokemon();
+    }
+    catch(error){
+        displayError("Pokemon already captured!");
+    }
+}
+function displayError(error){
+    const statusBox = document.querySelector('#status');
+    statusBox.innerText = error;
+    setTimeout(()=>statusBox.innerText="",5000);
+}
+
+document.querySelector('#release').addEventListener("click", releasePokemon)
+
+async function releasePokemon(){
+    const username = document.querySelector('#username').value;
+    const id = document.querySelector('#pokemon_input').value;
+    try{
+        await axios.delete(`${baseURL}pokemon/release/${id}`,{
+            headers: {
+                "username": username,
+            }
+        })
+        document.querySelector('#status').innerText = 'Released!';
+        setTimeout(()=>document.querySelector('#status').innerText = '',5000);
+        await getUsersPokemon();
+    }
+    catch(error){
+        displayError("Pokemon isn't in your collection");
+    }   
+}
+
+async function getUsersPokemon(){
+    const username = document.querySelector('#username').value;
+    const userPokemonsResponse = await axios.get(`${baseURL}pokemon/`, {
+        headers: {
+            "username": username,
+        }
+    });
+    const userPokemons = userPokemonsResponse.data['was_caught'];
+    const userPokemonDisplay = document.querySelector('#user_pokemons');
+    userPokemonDisplay.innerText = '';
+    for(let pokemon of userPokemons){
+        const newPokemon = document.createElement('div');
+        newPokemon.innerText = pokemon;
+        userPokemonDisplay.appendChild(newPokemon);
+    }
+}
+
+document.querySelector('#user_pokemons_btn').addEventListener('click', getUsersPokemon);
