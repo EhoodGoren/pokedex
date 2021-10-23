@@ -1,24 +1,32 @@
-#selected_pokemon {
-    border-style: solid;
-}
-
 body{
     background-size: 100%;
 }
 
 #selected_pokemon {
+    border-style: solid;
     margin-left: 5px;
+    margin-top: 5px;
     width: 50vw;
     font-size: 20px;
     background-color: rgba(255,255,255,0.5);
 }
 
-#selected_pokemon * {
-    margin-left: 5px;
-}
-
 #pokemon_input {
     margin-top: 5px;
+}
+
+#capture, #pokemon_input, #username, #search_pokemon {
+    margin-left: 5px;
+}
+#capture, #search_pokemon {
+    margin-top: 5px;
+}
+
+#status {
+    margin: 5px 0px 5px 5px;
+    border-style: solid;
+    width: 25vw;
+    height: 40px;
 }
 
 .pokemon_picture {

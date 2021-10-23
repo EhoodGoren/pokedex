@@ -1,26 +1,41 @@
-const baseURL = "https://pokeapi.co/api/v2/";
+const baseURL = "http://localhost:3000/";
 // Searches for a pokemon by its name or id
 async function getPokemon(identifier){
+    const username = document.querySelector('#username').value;
+    let response;
     if (typeof(identifier) === "string"){
         identifier = identifier.toLowerCase();
+        response = await axios.get(`${baseURL}pokemon/query?query=${identifier}`, {
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "*",
+                "Access-Control-Allow-Headers": "*",
+                "username": username,
+            }
+        });
     }
-    identifier = identifier.toLowerCase();
-    const response = await axios.get(`${baseURL}pokemon/${identifier}`);
+    else{
+        response = await axios.get(`${baseURL}pokemon/get/${identifier}`);
+    }
+    // identifier = identifier.toLowerCase();
+    // const response = await axios.get(`${baseURL}pokemon/${identifier}`);
     return response.data;
 }
 
-// Returns a pokemon object with selected attributes
+/*// Returns a pokemon object with selected attributes
 function pokemonInfo(pokemon){
     const newPokemon = {
         Name: pokemon.name,
         Height: pokemon.height,
         Weight: pokemon.weight,
         Types: pokemon.types,
-        front: pokemon.sprites.front_default,
-        back: pokemon.sprites.back_default,
+        front: pokemon.front_pic,
+        back: pokemon.back_pic,
+        abilities: pokemon.abilities
     }
+    console.log(newPokemon);
     return newPokemon;
-}
+}*/
 
 // Generates a new pokemon in DOM
 // pokemon = obj
@@ -38,15 +53,18 @@ function generatePokemon(pokemon){
 
 // Returns an element with the value as content
 function checkAttribute(attribute, value){
-    if(attribute === "front"){
+    if(attribute === "front_pic"){
         const newImg = document.createElement("img");
         newImg.setAttribute("src", value);
         newImg.classList.add("pokemon_picture");
         return newImg;
     }
-    if(attribute === "back") return "dont_display";
-    if(attribute === "Types"){
+    if(attribute === "back_pic") return "dont_display";
+    if(attribute === "types"){
         return createTypes(value);
+    }
+    if(attribute === "abilities"){
+        return createAbilities(value);
     }
     else{
         const textAttribtue = document.createElement("div");
@@ -58,15 +76,29 @@ function checkAttribute(attribute, value){
 // Creates the types section
 // types is an object
 function createTypes(types){
+    console.log(types);
     const typesList = document.createElement("div");
     typesList.innerText = "Types: ";
     for(let type of types){
         const newType = document.createElement("div");
-        newType.innerText += `${type.type.name} `;
+        // newType.innerText += `${type.type.name} `;
+        newType.innerText += `${type} `;
         newType.classList.add("types");
         typesList.appendChild(newType);
     }
     return typesList;
+}
+
+function createAbilities(abilities){
+    const abilitiesList = document.createElement("div");
+    abilitiesList.innerText = "Abilities: ";
+    for(let ability of abilities){
+        const newAbility = document.createElement("div");
+        newAbility.innerText += `${ability} `;
+        newAbility.classList.add("abilities");
+        abilitiesList.appendChild(newAbility);
+    }
+    return abilitiesList;
 }
 
 // Displays a new featured Pokemon.
@@ -74,17 +106,17 @@ async function createPokemon(identifier){
     clearPrevPokemon();
     clearPrevTypePokemons();
     let error = false;
-    const pokemonResponse = await getPokemon(identifier).catch(() => {
+    const responsePokemon = await getPokemon(identifier).catch(() => {
         error = true;
     });
     if(error){
         pokemonNotFound();
         return;
     }
-    const selectedPokemon = pokemonInfo(pokemonResponse);
-    generatePokemon(selectedPokemon);
-    addHoverListeners(selectedPokemon.front, selectedPokemon.back);
-    addTypesListeners(selectedPokemon);
+    // const selectedPokemon = pokemonInfo(pokemonResponse);
+    generatePokemon(responsePokemon);
+    addHoverListeners(responsePokemon.front_pic, responsePokemon.back_pic);
+    addTypesListeners(responsePokemon);
 }
 
 // Clears all previously displayed pokemons
@@ -202,15 +234,17 @@ async function typePokemonClicked(event){
 }
 
 function pokemonNotFound(){
-    const pokemon = document.querySelector("#selected_pokemon");
-    const error = document.createElement("div");
+    // const pokemon = document.querySelector("#selected_pokemon");
+    // const error = document.createElement("div");
+    const error = document.querySelector('#status');
     error.innerText = "Pokemon not found";
-    pokemon.appendChild(error);
-    setTimeout(() => pokemon.removeChild(error), 5000);
+    // pokemon.appendChild(error);
+    // setTimeout(() => pokemon.removeChild(error), 5000);
+    setTimeout(() => {error.value=""}, 5000);
 }
 
 const searchButton = document.querySelector("#search_pokemon");
 searchButton.addEventListener("click", searchPokemon);
 
-document.body.style.backgroundImage = "url('https://pbs.twimg.com/media/DVMT-6OXcAE2rZY.jpg')"
-// document.querySelector("#selected_pokemon").style.backgroundImage = "url('http://cdn.shopify.com/s/files/1/1756/9559/products/pokeball_coaster_photo_33c69500-8564-4842-a2a7-3803975a2d3b_1024x1024.jpg?v=1557064432')"
+document.body.style.backgroundImage = "url('https://pbs.twimg.com/media/DVMT-6OXcAE2rZY.jpg')";
+
